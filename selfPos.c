@@ -1,6 +1,9 @@
 #include<stdio.h>
+#include<stdlib.h>
 #include<math.h>
 #include<time.h>
+#include"header.h"
+#include"param.h"
 
 
 /* 
@@ -25,7 +28,7 @@ void countCicleTime(){
 ロボットの自己位置情報の初期化 
 x, y座標、姿勢角度、速度、角速度を０に設定
 */
-void initiateAbsolutePos
+void self_initiateAbsolutePos
 (struct self_position_data_t* absolute_locate){
   absolute_locate->pos.x = 0;
   absolute_locate->pos.y = 0;
@@ -48,18 +51,18 @@ double getRadian
 詳しくはオドメトリ（自己位置推定法）の相対位置算出を参照してください
 */
 struct self_position_data_t getRelativeSelfPos
-(struct self_position_data_t absolute_locate, const struct wheel_speed_t wheel_speed){
+(struct self_position_data_t* absolute_locate, struct wheel_speed_t wheel_speed){
   struct self_position_data_t relative_locate;
   double past_theta_rad;
   
-  past_theta_rad = getRadian(absolute_locate.theta);
-  relative_locate.pos.x = absolute_locate.vel * cos(past_theta_rad) * CICLE_TIME_SEC;
-  relative_locate.pos.y = absolute_locate.vel * sin(past_theta_rad) * CICLE_TIME_SEC;
-  relative_locate.vel = (vel_left + vel_right) / 2;
+  past_theta_rad = getRadian(absolute_locate->theta);
+  relative_locate.pos.x = absolute_locate->vel * cos(past_theta_rad) * CICLE_TIME_SEC;
+  relative_locate.pos.y = absolute_locate->vel * sin(past_theta_rad) * CICLE_TIME_SEC;
+  relative_locate.vel = (wheel_speed.vel_left + wheel_speed.vel_right) / 2;
   relative_locate.omega = WHEEL_DISTANCE * (wheel_speed.vel_right - wheel_speed.vel_left) / 2;
-  relative_locate.theta = absolute_locate.omega * CICLE_TIME_SEC / 100;
+  relative_locate.theta = absolute_locate->omega * CICLE_TIME_SEC / 100;
 
-  return realtive_locate;
+  return relative_locate;
 }
 
 /*
@@ -70,7 +73,7 @@ void getCurrentSelfPos
 (struct self_position_data_t* absolute_locate, const struct wheel_speed_t wheel_speed){
   struct self_position_data_t relative_locate;
 
-  relative_locate = getRelativeSelfPos(sum_data, wheel_speed);
+  relative_locate = getRelativeSelfPos(absolute_locate, wheel_speed);
   absolute_locate->pos.x += relative_locate.pos.x;
   absolute_locate->pos.y += relative_locate.pos.y;
   absolute_locate->theta += relative_locate.theta;

@@ -53,4 +53,26 @@ struct field_outline_data_t{
   int side_length;
 };
 
-#endif HEADER_H
+
+/* プロトタイプ宣言 */
+//selfPos.c
+void countCicleTime();
+void self_initiateAbsolutePos
+(struct self_position_data_t* absolute_locate);
+void getCurrentSelfPos
+(struct self_position_data_t* absolute_locate, const struct wheel_speed_t wheel_speed);
+struct self_position_data_t getRelativeSelfPos
+(struct self_position_data_t* absolute_locate, struct wheel_speed_t wheel_speed);
+void filePrintCoord
+(FILE *fp, char *filename, char *mode, int x, int y);
+
+//robotControl.c
+void robot_Stop_Back_Stop
+(double wait_time, int back_distance, int back_vel, struct self_position_data_t* absolute_locate);
+int robot_Turn_Stop
+(int target_angle, int correction_angle, struct wheel_speed_t turn_speed, int absolute_locate_theta);
+
+struct field_outline_data_t form_getFieldFormInfo
+(struct self_position_data_t *absolute_locate, const struct wheel_speed_t go_forward);
+
+#endif

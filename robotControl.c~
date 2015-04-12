@@ -1,11 +1,5 @@
 #include<createoi.h>
 #include<stdio.h>
-#include<stdlib.h>
-#include<math.h>
-#include"header.h"
-#include"param.h"
-
-extern const struct wheel_speed_t go_inward_100;
 
 /*
 ロボットを一定秒停止させる
@@ -41,9 +35,9 @@ void robot_GoBackward
   
   //TODO:速度と角速度の初期化がいるかの確認
   
-  directDrive(go_inward_100.vel_left, go_inward_100.vel_right);
-  while(abs(absolute_locate->pos.x - start_pos.x) <= back_distance ||abs(absolute_locate->pos.y - start_pos.y) <= back_distance){
-	getCurrentSelfPos(absolute_locate, go_inward_100);
+  directDrive(back_vel, back_vel);
+  while(abs(absolute_locate->pos.x - start_pos.x <= back_distance ||abs(absolute_locate->pos.y - start_pos.y <= back_distance){
+	getCurrentSelfPos(absolute_locate, vel_left, vel_right);
         countCicleTime();
       }
       return;
@@ -66,31 +60,3 @@ void robot_Stop_Back_Stop
 
   return;
 }
-
-/*
-createを指定した角度旋回させた後、一定秒停止させる。
-旋回に応じて自己位置情報（姿勢角度のみ）を更新する。
-【引数】
-target_angle 目標旋回角度[deg]
-correction_angle 目標旋回角度の誤差補正角度[deg]
-turn_speed 左右の車輪の回転速度[mm/sec]
-absolute_locate_theta ロボットの自己姿勢角度[deg]
-【戻り値】
-absolute_locate_theta ロボットの自己姿勢角度[deg]
-*/
-int robot_Turn_Stop
-(int target_angle, int correction_angle, struct wheel_speed_t turn_speed, int absolute_locate_theta){
-  double wait_time = 0.5;
-  int current_angle = getAngle();
-  int initial_angle = current_angle;
-  directDrive(turn_speed.vel_left, turn_speed.vel_right);
-  while(1){
-    current_angle += getAngle();
-    if(abs(current_angle - initial_angle) >= (target_angle - correction_angle)){
-      robot_Stop_Wait(wait_time);
-      break;
-    }
-  }
-  return absolute_locate_theta += target_angle;
-}
-
