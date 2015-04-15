@@ -5,26 +5,12 @@
 #include"header.h"
 #include"param.h"
 
-static int judgeCorner
-(struct xy_coord_data_t current_bump_pos, struct xy_coord_data_t before_bump_pos);
-
-static struct xy_coord_data_t getBumpPos
-(struct self_position_data_t* absolute_locate);
-
-static int checkCornerProbability
-(struct xy_coord_data_t current_bump_pos, struct xy_coord_data_t before_bump_pos);
-
-static int judgeCorner
-(struct xy_coord_data_t current_bump_pos, struct xy_coord_data_t before_bump_pos);
-
-static struct xy_coord_data_t getCornerPos
-(struct self_position_data_t* absolute_locate);
-
-static int getFieldLength
-(struct xy_coord_data_t begin_corner_pos, struct xy_coord_data_t end_corner_pos);
-
-static struct field_corner_angle_data_t setEachCornerAngle
-(struct self_position_data_t* absolute_locate, int* corner_approach_angle);
+static int form_judgeCorner(struct xy_coord_data_t, struct xy_coord_data_t);
+static struct xy_coord_data_t form_getBumpPos(struct self_position_data_t*);
+static int form_checkCornerProbability(struct xy_coord_data_t, struct xy_coord_data_t);
+static struct xy_coord_data_t form_getCornerPos(struct self_position_data_t*);
+static int form_getFieldLength(struct xy_coord_data_t, struct xy_coord_data_t);
+static struct field_corner_angle_data_t form_setEachCornerAngle(struct self_position_data_t*, int*);
 
 
 extern const struct wheel_speed_t turn_clockwise_100;
@@ -35,7 +21,7 @@ createが物体と衝突した位置座標(x, y)を返す
 【戻り値】
 bump_pos 衝突位置座標
 */
-static struct xy_coord_data_t getBumpPos
+static struct xy_coord_data_t form_getBumpPos
 (struct self_position_data_t* absolute_locate){
   struct xy_coord_data_t bump_pos;
 
@@ -57,12 +43,13 @@ before_bump_pos 直前の衝突位置座標
 【戻り値】
 TRUE（隅の可能性あり） or FALSE（隅の可能性無し）
 */
-static int checkCornerProbability
+static int form_checkCornerProbability
 (struct xy_coord_data_t current_bump_pos, struct xy_coord_data_t before_bump_pos){
   int diff_x, diff_y;
 
   diff_x = current_bump_pos.x - before_bump_pos.y;
   diff_y = current_bump_pos.y - before_bump_pos.y;
+  printf("diffx:%d diffy:%d\n", abs(diff_x), abs(diff_y));
   if(abs(diff_x) < CORN_PROB_THRE_X && abs(diff_y) < CORN_PROB_THRE_Y){
     return TRUE;
   }
@@ -85,19 +72,19 @@ before_bump_pos 直前の衝突位置座標
 【戻り値】
 TRUE（隅と判断） or FALSE（隅でない）
 */
-static int judgeCorner
+static int form_judgeCorner
 (struct xy_coord_data_t current_bump_pos, struct xy_coord_data_t before_bump_pos){
   int corner_probability_flag, judge_corner_flag;
   static int corner_probability_counter = 0;
 
-  corner_probability_flag = checkCornerProbability(current_bump_pos, before_bump_pos);
+  corner_probability_flag = form_checkCornerProbability(current_bump_pos, before_bump_pos);
   if(corner_probability_flag == TRUE){
     corner_probability_counter++;
   }
   else{
     corner_probability_counter = 0;
   }
-
+  printf("corner_probability = %d\n", corner_probability_counter);
   if(corner_probability_counter == JUDGE_CORNER_BUMP_NUM){
     return TRUE;
   }
@@ -120,7 +107,7 @@ absolute_locate ロボットの自己位置情報
 【戻り値】
 無し
 */
-static void resetAbsoluteTheta
+static void form_resetAbsoluteTheta
 (int corner_counter, struct self_position_data_t* absolute_locate){
   if(corner_counter == 1){
     absolute_locate->theta = TARGET_ANGLE_TO_SERCH_FIELD_FORM * JUDGE_CORNER_BUMP_NUM;
@@ -138,7 +125,7 @@ absolute_locate　ロボットの自己位置座標
 【戻り値】
 corner_pos 隅の位置座標(x, y)
 */
-static struct xy_coord_data_t getCornerPos
+static struct xy_coord_data_t form_getCornerPos
 (struct self_position_data_t* absolute_locate){
   struct xy_coord_data_t corner_pos;
 
@@ -157,7 +144,7 @@ end_corner_pos 今回検知した隅の位置座標
 【戻り値】
 field_length 隅と隅の距離
 */
-static int getFieldLength
+static int form_getFieldLength
 (struct xy_coord_data_t begin_corner_pos, struct xy_coord_data_t end_corner_pos){
   int diff_x, diff_y;
   int field_length;
@@ -185,7 +172,7 @@ corner_approach_angle[2] == 100
 一つ目の隅の角度(corner_angle.first)は100°
 が代入される。
   */
-static struct field_corner_angle_data_t setEachCornerAngle
+static struct field_corner_angle_data_t form_setEachCornerAngle
 (struct self_position_data_t* absolute_locate, int* corner_approach_angle){
   struct field_corner_angle_data_t corner_angle;
 
@@ -200,13 +187,10 @@ static struct field_corner_angle_data_t setEachCornerAngle
 
 struct field_outline_data_t form_getFieldFormInfo
 (struct self_position_data_t *absolute_locate, const struct wheel_speed_t go_forward){
-  struct xy_coord_data_t current_bump_pos;
-  struct xy_coord_data_t before_bump_pos;
-  struct xy_coord_data_t start_corner_pos;
-  struct xy_coord_data_t first_corner_pos;
-  struct xy_coord_data_t second_corner_pos;
+  struct xy_coord_data_t current_bump_pos, before_bump_pos;
+  struct xy_coord_data_t start_corner_pos, first_corner_pos, second_corner_pos;
   struct field_outline_data_t field_info;
-  int corner_counter;
+  int corner_counter = 0;
   int loop_counter = 0;
   int judge_bump;
   int judge_corner_flag;
@@ -225,58 +209,61 @@ struct field_outline_data_t form_getFieldFormInfo
   /* 衝突位置座標の初期化 */
   before_bump_pos.x = current_bump_pos.x = 0;
   before_bump_pos.y = current_bump_pos.y = 0;
-  
-  /* createを直進させる */
-  directDrive(go_forward.vel_left, go_forward.vel_right);
+
   
   while(1){
+    /* createを直進させる */
+    directDrive(go_forward.vel_left, go_forward.vel_right);
+
     getCurrentSelfPos(absolute_locate, go_forward);
     if(loop_counter % DRAW_COUNT_RANGE == 0){
-      filePrintCoord(fp1, fname1, "w", absolute_locate->pos.x, absolute_locate->pos.y);
-      /* createが衝突したかを判定する */
-      /* getBumpsAndWheelDropsはcreateが衝突したならば以下の値を返す */
-      /* 右側のbumpsensorが衝突を検知->1 左側のbumpsensor->2 両方のbumpsensorに衝突を検知->3 */
-      judge_bump = getBumpsAndWheelDrops();
-      if(judge_bump == 1 || judge_bump == 2 || judge_bump == 3){
-	current_bump_pos = getBumpPos(absolute_locate);
+      filePrintCoord(fp1, fname1, "a", absolute_locate->pos.x, absolute_locate->pos.y);
+      //printf("%d, %d\n", absolute_locate->pos.x, absolute_locate->pos.y);
+    }
+    /* createが衝突したかを判定する */
+    /* getBumpsAndWheelDropsはcreateが衝突したならば以下の値を返す */
+    /* 右側のbumpsensorが衝突を検知->1 左側のbumpsensor->2 両方のbumpsensorに衝突を検知->3 */
+    judge_bump = getBumpsAndWheelDrops();
+    if(judge_bump == 1 || judge_bump == 2 || judge_bump == 3){
+      current_bump_pos = form_getBumpPos(absolute_locate);
+      
+      /*隅に到達したならば、judge_corner_flagを立てる*/
+      judge_corner_flag = form_judgeCorner(current_bump_pos, before_bump_pos);
+      
+      if(judge_corner_flag == TRUE){
+	corner_counter++;
+	printf("corner_num = %d\n\n\n\n", corner_counter);
+	form_resetAbsoluteTheta(corner_counter, absolute_locate);
+	approach_corner_angle[corner_counter] = absolute_locate->theta;/* 隅に進入時のcreateの姿勢角度を保存 */
 	
-	/*隅に到達したならば、judge_corner_flagを立てる*/
-	judge_corner_flag = judgeCorner(current_bump_pos, before_bump_pos);
-	
-	if(judge_corner_flag == TRUE){
-	  corner_counter++;
-	  resetAbsoluteTheta(corner_counter, absolute_locate);
-	  approach_corner_angle[corner_counter] = absolute_locate->theta;/* 隅に進入時のcreateの姿勢角度を保存 */
-	  
-	  /*
-	    一つ目及び２つ目の隅を見つけた際にフィールドの縦横の長さを計算する 
-	    フィールドの形は平行四辺形との規定があるため、２辺の長さしか算出して
-	    いない。
-	  */
-	  if(corner_counter == 1){
-	    first_corner_pos = getCornerPos(absolute_locate);
-	    field_info.virtical_length = getFieldLength(start_corner_pos, first_corner_pos);
-	  }
-	  else if(corner_counter == 2){
-	    second_corner_pos = getCornerPos(absolute_locate);
-	    field_info.side_length = getFieldLength(first_corner_pos, second_corner_pos);
-	  }
-	}
-	if(corner_counter == CORNER_NUM){
-	  field_info.corner_angle = setEachCornerAngle(absolute_locate, approach_corner_angle);
+	/*
+	  一つ目及び２つ目の隅を見つけた際にフィールドの縦横の長さを計算する 
+	  フィールドの形は平行四辺形との規定があるため、２辺の長さしか算出して
+	  いない。
+	*/
+	switch(corner_counter){
+	case 1:
+	  first_corner_pos = form_getCornerPos(absolute_locate);
+	  field_info.virtical_length = form_getFieldLength(start_corner_pos, first_corner_pos);
+	  break;
+	case 2:
+	  second_corner_pos = form_getCornerPos(absolute_locate);
+	  field_info.side_length = form_getFieldLength(first_corner_pos, second_corner_pos);
+	  break;
+	case CORNER_NUM:
+	  field_info.corner_angle = form_setEachCornerAngle(absolute_locate, approach_corner_angle);
 	  robot_Stop_Back_Stop(1, BACK_DISTANCE, -100, absolute_locate);
 	  absolute_locate->theta = robot_Turn_Stop(TARGET_ANGLE_5, CORRECTION_ANGLE_5, turn_clockwise_100, absolute_locate->theta);
+	  return field_info;
+	default:
 	  break;
 	}
-	else{
+      }
 	  robot_Stop_Back_Stop(0.2, BACK_DISTANCE, -100, absolute_locate);
 	  absolute_locate->theta = robot_Turn_Stop(TARGET_ANGLE_5, CORRECTION_ANGLE_5, turn_clockwise_100, absolute_locate->theta);
 	  before_bump_pos = current_bump_pos;
-	}
-	countCicleTime();
-	draw_count++;
-      }
     }
+    countCicleTime();
+    draw_count++;
   }
-  return field_info;
 }
