@@ -14,15 +14,15 @@ const struct wheel_speed_t turn_clock_100 = {100, -100};
 const struct wheel_speed_t go_forward_100 = {100, 100};
 const struct wheel_speed_t go_inward_100 = {-100, -100};
 int main(){
-  struct self_position_data_t *absolute_locate;
-	startOI_MT("/dev/ttyUSB0");
-	directDrive(100, 100);
-	/* 自己位置情報の初期化 */
-	self_initiateAbsolutePos(absolute_locate);
-	/* フィールド外形情報の取得 */
-	form_getFieldFormInfo(absolute_locate, go_forward_100);
-	printf("ok?\n");
+  struct self_position_data_t absolute_locate;
 
-	stopOI_MT();
+  startOI_MT("/dev/ttyUSB0");
+  /* 自己位置情報の初期化 */
+  initAbsolutePos(&absolute_locate);
+  /* フィールド外形情報の取得 */
+  form_getFieldFormInfo(&absolute_locate, go_forward_100);
+  printf("ok?\n");
+
+  stopOI_MT();
 }
 
