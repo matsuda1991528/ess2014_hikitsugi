@@ -32,7 +32,7 @@ absolute_locate ロボットの自己位置情報
 【戻り値】
 無し
 */
-void self_initAbsolutePos
+void initAbsolutePos
 (struct self_position_data_t* absolute_locate){
   absolute_locate->pos.x = 0;
   absolute_locate->pos.y = 0;
