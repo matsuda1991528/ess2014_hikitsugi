@@ -32,21 +32,20 @@ absolute_locate ロボットの自己位置情報
 無し
 */
 void robot_GoBackward
-(int back_distance, int back_vel, struct self_position_data_t* absolute_locate){
-  struct xy_coord_data_t start_pos;
-  int vel_left, vel_right;
+(int target_distance, int back_vel, struct self_pos_t* absolute_locate){
+  struct xy_coord_t start_pos;
+
+  //TODO:速度と角速度の初期化がいるかの確認
+  //self_initVelAndOmega(&absolute_locate->vel, &absolute_locate->omega);
+  directDrive(go_inward_100.vel_left, go_inward_100.vel_right);
   start_pos.x = absolute_locate->pos.x;
   start_pos.y = absolute_locate->pos.y;
-  vel_left = vel_right = back_vel;
-  
-  //TODO:速度と角速度の初期化がいるかの確認
-  
-  directDrive(go_inward_100.vel_left, go_inward_100.vel_right);
-  while(abs(absolute_locate->pos.x - start_pos.x) <= back_distance ||abs(absolute_locate->pos.y - start_pos.y) <= back_distance){
-	getCurrentSelfPos(absolute_locate, go_inward_100);
-        countCicleTime();
-      }
-      return;
+  getCurrentSelfPos(absolute_locate, go_inward_100);
+  while(sqrt(pow(absolute_locate->pos.x - start_pos.x,2) + pow(absolute_locate->pos.y - start_pos.y,2)) < target_distance){
+    getCurrentSelfPos(absolute_locate, go_inward_100);
+    countCicleTime();
+  }
+  return;
 }
 
 /*
@@ -59,7 +58,7 @@ back_vel ロボットを後進させる速度[mm/sec]
 無し
 */
 void robot_Stop_Back_Stop
-(double wait_time, int back_distance, int back_vel, struct self_position_data_t* absolute_locate){
+(double wait_time, int back_distance, int back_vel, struct self_pos_t* absolute_locate){
   robot_Stop_Wait(wait_time);
   robot_GoBackward(back_distance, back_vel, absolute_locate);
   robot_Stop_Wait(wait_time);

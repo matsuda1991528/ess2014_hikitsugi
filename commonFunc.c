@@ -33,7 +33,7 @@ absolute_locate ロボットの自己位置情報
 無し
 */
 void initAbsolutePos
-(struct self_position_data_t* absolute_locate){
+(struct self_pos_t* absolute_locate){
   absolute_locate->pos.x = 0;
   absolute_locate->pos.y = 0;
   absolute_locate->theta = 0;
@@ -80,9 +80,9 @@ wheel_speed 車輪の回転速度[mm/sec]
 【戻り値】
 relative_locate １サイクル前の自己位置との相対位置
 */
-struct self_position_data_t getRelativeSelfPos
-(struct self_position_data_t* absolute_locate, struct wheel_speed_t wheel_speed){
-  struct self_position_data_t relative_locate;
+struct self_pos_t getRelativeSelfPos
+(struct self_pos_t* absolute_locate, struct wheel_speed_t wheel_speed){
+  struct self_pos_t relative_locate;
   double past_theta_rad;
   
   past_theta_rad = getRadian(absolute_locate->theta);
@@ -105,8 +105,8 @@ wheel_speed 車輪の回転速度
 無し
 */
 void getCurrentSelfPos
-(struct self_position_data_t* absolute_locate, const struct wheel_speed_t wheel_speed){
-  struct self_position_data_t relative_locate;
+(struct self_pos_t* absolute_locate, const struct wheel_speed_t wheel_speed){
+  struct self_pos_t relative_locate;
 
   relative_locate = getRelativeSelfPos(absolute_locate, wheel_speed);
   absolute_locate->pos.x += relative_locate.pos.x;

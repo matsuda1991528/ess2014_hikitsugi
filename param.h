@@ -5,9 +5,9 @@
 
 
 /* 外壁情報取得に使用するパラメータ群 */
-#define CORN_PROB_THRE_X 100 //隅か否かの判定を行うためのしきい値
-#define CORN_PROB_THRE_Y 100
-#define JUDGE_CORNER_BUMP_NUM 5
+#define CORN_PROB_THRE_X 150 //隅か否かの判定を行うためのしきい値
+#define CORN_PROB_THRE_Y 150
+#define JUDGE_CORNER_BUMP_NUM 3 //JUDGE_CORNER_BUMP_NUM回類似した位置で衝突したら隅と判定
 #define TARGET_ANGLE_TO_SERCH_FIELD_FORM 5 //外壁情報取得用の旋回角度
 #define CORNER_NUM 4         //フィールド隅の個数
 #define BACK_DISTANCE 50 //createが壁に衝突した際に後進する距離
