@@ -14,7 +14,7 @@ const struct wheel_speed_t turn_clock_100 = {100, -100};
 const struct wheel_speed_t go_forward_100 = {100, 100};
 const struct wheel_speed_t go_inward_100 = {-100, -100};
 int main(){
-  struct self_position_data_t absolute_locate;
+  struct self_pos_t absolute_locate;
 
   startOI_MT("/dev/ttyUSB0");
   /* 自己位置情報の初期化 */
