@@ -63,10 +63,10 @@ void getCurrentSelfPos
 (struct self_pos_t* absolute_locate, const struct wheel_speed_t wheel_speed);
 struct self_pos_t getRelativeSelfPos(struct self_pos_t*, struct wheel_speed_t);
 void filePrintCoord
-(FILE *fp, char *filename, char *mode, int x, int y);
+(FILE **fp, char *filename, char *mode, int x, int y);
 
 //robotControl.c
-void robot_Stop_Back_Stop(double, int, int, struct self_pos_t*);
+void robot_Stop_Back_Stop(double, int, struct self_pos_t*);
 int robot_Turn_Stop(int, int, struct wheel_speed_t, int);
 struct field_outline_t form_getFieldFormInfo(struct self_pos_t*, const struct wheel_speed_t);
 

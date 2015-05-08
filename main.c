@@ -21,7 +21,6 @@ int main(){
   initAbsolutePos(&absolute_locate);
   /* フィールド外形情報の取得 */
   form_getFieldFormInfo(&absolute_locate, go_forward_100);
-  printf("ok?\n");
 
   stopOI_MT();
 }

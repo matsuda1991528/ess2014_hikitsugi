@@ -5,12 +5,6 @@
 #include"header.h"
 #include"param.h"
 
-static int form_judgeCorner(struct xy_coord_t, struct xy_coord_t);
-static struct xy_coord_t form_getBumpPos(struct self_pos_t*);
-static int form_checkCornerProbability(struct xy_coord_t, struct xy_coord_t);
-static struct xy_coord_t form_getCornerPos(struct self_pos_t*);
-static int form_getFieldLength(struct xy_coord_t, struct xy_coord_t);
-static struct field_corner_angle_data_t form_setEachCornerAngle(struct self_pos_t*, int*);
 
 
 extern const struct wheel_speed_t turn_clockwise_100;
@@ -75,7 +69,7 @@ TRUE（隅と判断） or FALSE（隅でない）
 */
 static int form_judgeCorner
 (struct xy_coord_t current_bump_pos, struct xy_coord_t before_bump_pos){
-  int corner_probability_flag, judge_corner_flag;
+  int corner_probability_flag;
   static int corner_probability_counter = 0;
 
   corner_probability_flag = form_checkCornerProbability(current_bump_pos, before_bump_pos);
@@ -174,7 +168,7 @@ corner_approach_angle[2] == 100
 が代入される。
   */
 static struct field_corner_angle_data_t form_setEachCornerAngle
-(struct self_pos_t* absolute_locate, int* corner_approach_angle){
+(int* corner_approach_angle){
   struct field_corner_angle_data_t corner_angle;
 
   corner_angle.first = corner_approach_angle[2] - corner_approach_angle[1];
@@ -195,7 +189,6 @@ struct field_outline_t form_getFieldFormInfo
   int loop_counter = 0;
   int judge_bump;
   int judge_corner_flag;
-  int virtical_field_length, side_field_length;
   int approach_corner_angle[CORNER_NUM];
   int draw_count = 0;
 
@@ -218,7 +211,7 @@ struct field_outline_t form_getFieldFormInfo
 
     getCurrentSelfPos(absolute_locate, go_forward);
     if(loop_counter % DRAW_COUNT_RANGE == 0){
-      filePrintCoord(fp1, fname1, "a", absolute_locate->pos.x, absolute_locate->pos.y);
+      filePrintCoord(&fp1, fname1, "a", absolute_locate->pos.x, absolute_locate->pos.y);
       printf("%d, %d %d\n", absolute_locate->pos.x, absolute_locate->pos.y, absolute_locate->theta);
     }
     /* createが衝突したかを判定する */
@@ -252,15 +245,15 @@ struct field_outline_t form_getFieldFormInfo
 	  field_info.side_length = form_getFieldLength(first_corner_pos, second_corner_pos);
 	  break;
 	case CORNER_NUM:
-	  field_info.corner_angle = form_setEachCornerAngle(absolute_locate, approach_corner_angle);
-	  robot_Stop_Back_Stop(1, BACK_DISTANCE, -100, absolute_locate);
+	  field_info.corner_angle = form_setEachCornerAngle(approach_corner_angle);
+	  robot_Stop_Back_Stop(1, BACK_DISTANCE, absolute_locate);
 	  absolute_locate->theta = robot_Turn_Stop(TARGET_ANGLE_5, CORRECTION_ANGLE_5, turn_clockwise_100, absolute_locate->theta);
 	  return field_info;
 	default:
 	  break;
 	}
       }
-      robot_Stop_Back_Stop(0.2, BACK_DISTANCE, -100, absolute_locate);
+      robot_Stop_Back_Stop(0.2, BACK_DISTANCE, absolute_locate);
       absolute_locate->theta = robot_Turn_Stop(TARGET_ANGLE_5, CORRECTION_ANGLE_5, turn_clockwise_100, absolute_locate->theta);
       before_bump_pos = current_bump_pos;
     }

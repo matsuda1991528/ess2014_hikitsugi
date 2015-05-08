@@ -131,15 +131,15 @@ y y座標
 無し
 */
 void filePrintCoord
-(FILE *fp, char *filename, char *mode, int x, int y){
+(FILE **fp, char *filename, char *mode, int x, int y){
   static int counter = 0;
   counter++;
-  if((fp = fopen(filename, mode)) == NULL){
+  if((*fp = fopen(filename, mode)) == NULL){
     printf("cannnot file open\n");
     exit(1);
   }
   else{
-    fprintf(fp, "%4d, %4d\n", x, y);
+    fprintf(*fp, "%4d, %4d\n", x, y);
   }
 
   return;

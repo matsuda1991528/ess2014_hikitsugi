@@ -32,7 +32,7 @@ absolute_locate ロボットの自己位置情報
 無し
 */
 void robot_GoBackward
-(int target_distance, int back_vel, struct self_pos_t* absolute_locate){
+(int target_distance, struct self_pos_t* absolute_locate){
   struct xy_coord_t start_pos;
 
   //TODO:速度と角速度の初期化がいるかの確認
@@ -58,9 +58,9 @@ back_vel ロボットを後進させる速度[mm/sec]
 無し
 */
 void robot_Stop_Back_Stop
-(double wait_time, int back_distance, int back_vel, struct self_pos_t* absolute_locate){
+(double wait_time, int back_distance, struct self_pos_t* absolute_locate){
   robot_Stop_Wait(wait_time);
-  robot_GoBackward(back_distance, back_vel, absolute_locate);
+  robot_GoBackward(back_distance, absolute_locate);
   robot_Stop_Wait(wait_time);
 
   return;
